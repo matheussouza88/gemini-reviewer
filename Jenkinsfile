@@ -3,16 +3,12 @@ pipeline {
 
     environment {
         DOCKER_REGISTRY_HOST = 'ghcr.io'
-        DOCKER_REGISTRY_OWNER = 'matheussouza88'
+        DOCKER_REGISTRY_OWNER = "${env.GIT_URL ? env.GIT_URL.replace('git@github.com:', '').replace('https://github.com/', '').split('/')[0] : 'matheussouza88'}"
         DOCKER_REGISTRY = "${DOCKER_REGISTRY_HOST}/${DOCKER_REGISTRY_OWNER}"
         DOCKER_CREDENTIALS_ID = 'ghcr-auth'
         
         IMAGE_NAME = "${DOCKER_REGISTRY}/gemini-reviewer"
         DOCKERFILE = 'Dockerfile'
-    }
-
-    triggers {
-        pollSCM('H * * * *')
     }
 
     stages {
