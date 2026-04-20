@@ -1,0 +1,22 @@
+{
+  "projects": [
+    {
+      "name": "autonomous-reviewer",
+      "capabilities": {
+        "mcp-github": {
+          "enabled": true
+        },
+        "shell": {
+          "enabled": true
+        },
+        "google_web_search": {
+          "enabled": true
+        },
+        "web_fetch": {
+          "enabled": true
+        }
+      }
+    }
+  ],
+  "active_project": "autonomous-reviewer"
+}

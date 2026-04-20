@@ -42,7 +42,9 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image for ${IMAGE_NAME}:${env.IMAGE_TAG}..."
-                    sh "docker build -t ${IMAGE_NAME}:${env.IMAGE_TAG} -f ${DOCKERFILE} ."
+                    retry(3) {
+                        sh "docker build -t ${IMAGE_NAME}:${env.IMAGE_TAG} -f ${DOCKERFILE} ."
+                    }
                 }
             }
         }
@@ -55,8 +57,10 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login $DOCKER_REGISTRY_HOST -u $DOCKER_USER --password-stdin'
+                retry(3) {
+                    withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo $DOCKER_PASS | docker login $DOCKER_REGISTRY_HOST -u $DOCKER_USER --password-stdin'
+                    }
                 }
             }
         }
@@ -69,7 +73,9 @@ pipeline {
                 }
             }
             steps {
-                sh "docker push ${IMAGE_NAME}:${env.IMAGE_TAG}"
+                retry(3) {
+                    sh "docker push ${IMAGE_NAME}:${env.IMAGE_TAG}"
+                }
             }
         }
 
@@ -81,7 +87,9 @@ pipeline {
                 }
             }
             steps {
-                sh "docker tag ${IMAGE_NAME}:${env.IMAGE_TAG} ${IMAGE_NAME}:latest"
+                retry(3) {
+                    sh "docker tag ${IMAGE_NAME}:${env.IMAGE_TAG} ${IMAGE_NAME}:latest"
+                }
             }
         }
 
@@ -93,7 +101,9 @@ pipeline {
                 }
             }
             steps {
-                sh "docker push ${IMAGE_NAME}:latest"
+                retry(3) {
+                    sh "docker push ${IMAGE_NAME}:latest"
+                }
             }
         }
 
@@ -103,9 +113,11 @@ pipeline {
             }
             steps {
                 script {
-                    updateGithubStatus('success', 'Build successful', 'Jenkins Build')
-                    approveGithubPullRequest(env.CHANGE_ID)
-                    mergeGithubPullRequest(env.CHANGE_ID)
+                    retry(3) {
+                        updateGithubStatus('success', 'Build successful', 'Jenkins Build')
+                        approveGithubPullRequest(env.CHANGE_ID)
+                        mergeGithubPullRequest(env.CHANGE_ID)
+                    }
                 }
             }
         }
