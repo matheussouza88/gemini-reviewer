@@ -12,6 +12,10 @@ pipeline {
         DOCKERFILE = 'Dockerfile'
     }
 
+    triggers {
+        pollSCM('H * * * *')
+    }
+
     stages {
         stage('Initialize GitHub Status') {
             when {
