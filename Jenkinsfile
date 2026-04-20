@@ -11,6 +11,10 @@ pipeline {
         DOCKERFILE = 'Dockerfile'
     }
 
+    triggers {
+        pollSCM('H * * * *')
+    }
+
     stages {
         stage('Prepare Image Tag') {
             steps {
