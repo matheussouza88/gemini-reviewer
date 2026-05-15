@@ -1,6 +1,20 @@
 pipeline {
     agent any
 
+    properties([
+        pipelineTriggers([
+            pollSCM('H * * * *')
+        ]),
+        [
+            $class: 'jenkins.branch.OrganizationChildTriggersProperty',
+            templates: [[
+                $class: 'com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger',
+                spec: 'H * * * *',
+                interval: "3600000"
+            ]]
+        ]
+    ])
+
     environment {
         DOCKER_REGISTRY_HOST = 'ghcr.io'
         DOCKER_REGISTRY_OWNER = "${env.GIT_URL ? env.GIT_URL.replace('git@github.com:', '').replace('https://github.com/', '').split('/')[0] : 'matheussouza88'}"
